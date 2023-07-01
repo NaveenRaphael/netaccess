@@ -1,21 +1,10 @@
-use std::process::Command;
+mod gecko;
+mod login;
+use gecko::Gecko;
+use login::{Login, LoginDetails, LoginTypes};
 use thirtyfour::prelude::*;
 
-use std::env;
-
-struct LoginDetails {
-    username: String,
-    password: String,
-}
-impl LoginDetails {
-    pub fn get() -> Result<LoginDetails, env::VarError> {
-        let username = env::var("LDAP_USERNAME")?;
-        let password = env::var("LDAP_PASSWORD")?;
-        Ok(LoginDetails { username, password })
-    }
-}
-
-async fn navigate_site(login: LoginDetails) -> WebDriverResult<()> {
+async fn navigate_site(login: Login) -> WebDriverResult<()> {
     let caps = DesiredCapabilities::firefox();
 
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
@@ -24,10 +13,10 @@ async fn navigate_site(login: LoginDetails) -> WebDriverResult<()> {
     driver.goto("https://netaccess.iitm.ac.in").await?;
 
     let username_fill = driver.find(By::Id("username")).await?;
-    username_fill.send_keys(login.username).await?;
+    username_fill.send_keys(login.username()).await?;
 
     let password_fill = driver.find(By::Id("password")).await?;
-    password_fill.send_keys(login.password).await?;
+    password_fill.send_keys(login.password()).await?;
 
     let first_button = driver.find(By::Id("submit")).await?;
     first_button.click().await?;
@@ -47,15 +36,13 @@ async fn navigate_site(login: LoginDetails) -> WebDriverResult<()> {
 
 #[tokio::main]
 async fn main() -> WebDriverResult<()> {
-    let login = LoginDetails::get().expect("LDAP Credentials not in environment variables...");
+    let login = Login::new(LoginTypes::Environment);
 
-    let mut gecko = Command::new("geckodriver")
-        .spawn()
-        .expect("Geckodriver not found; please run cargo install geckodriver first");
-    let e = navigate_site(login).await;
+    let _gecko = match Gecko::new() {
+        Ok(g) => g,
+        Err(a) => panic!("{}", a),
+    };
+
+    navigate_site(login).await
     // Always explicitly close the browser.
-
-    gecko.kill().expect("Well oopse");
-
-    e
 }

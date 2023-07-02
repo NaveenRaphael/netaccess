@@ -2,7 +2,7 @@ mod gecko;
 mod login;
 use gecko::Gecko;
 use login::{Login, LoginTypes};
-use thirtyfour::prelude::*;
+use thirtyfour::prelude::{By, DesiredCapabilities, WebDriver, WebDriverResult};
 
 async fn navigate_site(login: Login) -> WebDriverResult<()> {
     let caps = DesiredCapabilities::firefox();

@@ -1,7 +1,7 @@
 mod gecko;
 mod login;
 use gecko::Gecko;
-use login::{Login, LoginDetails, LoginTypes};
+use login::{Login, LoginTypes};
 use thirtyfour::prelude::*;
 
 async fn navigate_site(login: Login) -> WebDriverResult<()> {
@@ -44,5 +44,4 @@ async fn main() -> WebDriverResult<()> {
     };
 
     navigate_site(login).await
-    // Always explicitly close the browser.
 }

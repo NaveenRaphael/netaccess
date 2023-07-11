@@ -4,12 +4,7 @@ use gecko::Gecko;
 use login::{Login, LoginTypes};
 use thirtyfour::prelude::{By, DesiredCapabilities, WebDriver, WebDriverResult};
 
-async fn navigate_site(login: Login) -> WebDriverResult<()> {
-    let caps = DesiredCapabilities::firefox();
-
-    let driver = WebDriver::new("http://localhost:4444", caps).await?;
-
-    // Navigate to https://wikipedia.org.
+async fn navigate_site(login: Login, driver: &WebDriver) -> WebDriverResult<()> {
     driver.goto("https://netaccess.iitm.ac.in").await?;
 
     let username_fill = driver.find(By::Id("username")).await?;
@@ -30,7 +25,6 @@ async fn navigate_site(login: Login) -> WebDriverResult<()> {
     let second_button = driver.find(By::Id("approveBtn")).await?;
     second_button.click().await?;
 
-    driver.quit().await?;
     Ok(())
 }
 
@@ -43,5 +37,11 @@ async fn main() -> WebDriverResult<()> {
         Err(a) => panic!("{}", a),
     };
 
-    navigate_site(login).await
+    let driver = WebDriver::new("http://localhost:4444", DesiredCapabilities::firefox()).await?;
+
+    navigate_site(login, &driver).await?;
+
+    driver.quit().await?;
+
+    Ok(())
 }

@@ -3,6 +3,7 @@ use std::env;
 const USERNAME: &str = "username";
 const PASSWORD: &str = "password";
 
+#[allow(unused)]
 pub enum LoginTypes {
     Environment,
     Module,

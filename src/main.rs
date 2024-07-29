@@ -1,8 +1,10 @@
 mod gecko;
 mod login;
+use std::{thread, time::Duration};
+
 use gecko::Gecko;
 use login::{Login, LoginTypes};
-use thirtyfour::prelude::{By, DesiredCapabilities, WebDriver, WebDriverResult};
+use thirtyfour::prelude::{By, DesiredCapabilities, WebDriver, WebDriverError, WebDriverResult};
 
 async fn navigate_site(login: Login, driver: &WebDriver) -> WebDriverResult<()> {
     driver.goto("https://netaccess.iitm.ac.in").await?;
@@ -37,7 +39,21 @@ async fn main() -> WebDriverResult<()> {
         Err(a) => panic!("{}", a),
     };
 
-    let driver = WebDriver::new("http://localhost:4444", DesiredCapabilities::firefox()).await?;
+    //Because Linux is just that fast smh
+    let driver = match WebDriver::new("http://localhost:4444", DesiredCapabilities::firefox()).await
+    {
+        Ok(a) => a,
+        Err(_e) => {
+            thread::sleep(Duration::from_millis(10));
+            if let Ok(a) =
+                WebDriver::new("http://localhost:4444", DesiredCapabilities::firefox()).await
+            {
+                a
+            } else {
+                panic!("Webdriver did not open in time?")
+            }
+        }
+    };
 
     navigate_site(login, &driver).await?;
 

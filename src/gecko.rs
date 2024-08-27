@@ -17,7 +17,10 @@ impl DriverSpawn {
             Ok(a)=> Ok(DriverSpawn(a)),
         }
             }
-            DriverTypes::Edge => todo!(),
+            DriverTypes::Edge => match Command::new("msedgedriver").spawn() {
+                Err(e) => Err(format!("Edgedriver error! {}", e)),
+                Ok(a) => Ok(DriverSpawn(a)),
+            },
         }
     }
 }

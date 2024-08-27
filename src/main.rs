@@ -45,14 +45,14 @@ async fn main() {
     {
         Ok(a) => a,
         Err(_e) => {
+            println!("Waiting for some more time...");
             thread::sleep(Duration::from_millis(10));
-            if let Ok(a) = ClientBuilder::native()
+            match ClientBuilder::native()
                 .connect("http://localhost:4444")
                 .await
             {
-                a
-            } else {
-                panic!("Webdriver did not open in time?")
+                Ok(a) => a,
+                Err(e) => panic!("Cannot connect because {e}"),
             }
         }
     };

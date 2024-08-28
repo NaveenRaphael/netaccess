@@ -11,13 +11,16 @@ impl DriverSpawn {
         match dr {
             DriverTypes::Gecko => {
                 match Command::new("geckodriver")
-            .args(["--log", "fatal"])
+            .args(["--log", "fatal", "--port", "4444"])
             .spawn(){
             Err(e) =>Err(format!("Geckodriver possibly not installed; please run `cargo install geckodriver`. Actual error: {}", e)),
             Ok(a)=> Ok(DriverSpawn(a)),
         }
             }
-            DriverTypes::Edge => match Command::new("msedgedriver").spawn() {
+            DriverTypes::Edge => match Command::new("msedgedriver")
+                .args(["--port", "4444"])
+                .spawn()
+            {
                 Err(e) => Err(format!("Edgedriver error! {}", e)),
                 Ok(a) => Ok(DriverSpawn(a)),
             },

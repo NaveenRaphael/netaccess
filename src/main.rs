@@ -3,7 +3,6 @@ mod login;
 use fantoccini::{Client, ClientBuilder, Locator};
 use gecko::{DriverSpawn, DriverTypes};
 use login::{Login, LoginTypes};
-use std::{thread, time::Duration};
 
 async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::error::CmdError> {
     driver.goto("https://netaccess.iitm.ac.in").await?;
@@ -33,36 +32,26 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
 async fn main() {
     let login = Login::new(LoginTypes::Environment);
 
-    let _gecko = match DriverSpawn::new(DriverTypes::Gecko) {
+    let driver = match DriverSpawn::new(DriverTypes::Edge) {
         Ok(g) => g,
         Err(a) => panic!("{}", a),
     };
 
     //Because Linux is just that fast smh
-    let driver = match ClientBuilder::native()
-        .connect("http://localhost:4444")
+    let client = match ClientBuilder::native()
+        .connect(driver.get_port().as_str())
         .await
     {
         Ok(a) => a,
-        Err(_e) => {
-            println!("Waiting for some more time...");
-            thread::sleep(Duration::from_millis(10));
-            match ClientBuilder::native()
-                .connect("http://localhost:4444")
-                .await
-            {
-                Ok(a) => a,
-                Err(e) => panic!("Cannot connect because {e}"),
-            }
-        }
+        Err(e) => panic!("Cannot connect because {e}"),
     };
 
-    let Ok(_) = navigate_site(login, &driver).await else {
+    let Ok(_) = navigate_site(login, &client).await else {
         println!("Error in navigating site");
         return;
     };
 
-    let Ok(_) = driver.close().await else {
+    let Ok(_) = client.close().await else {
         println!("Error in closing driver");
         return;
     };

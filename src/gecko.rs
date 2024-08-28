@@ -33,8 +33,8 @@ impl DriverSpawn {
         let mut port = String::new();
 
         let re = match dr {
-            DriverTypes::Gecko => Regex::new(r"127.0.0.1:(\d+)").unwrap(),
-            DriverTypes::Edge => Regex::new(r"\D(\d{5})\D").unwrap(),
+            DriverTypes::Gecko => Regex::new(r"127\.0\.0\.1:(\d+)").unwrap(),
+            DriverTypes::Edge => Regex::new(r" (\d{5})\.").unwrap(),
         };
         while let Ok(n) = bufread.read_line(&mut buf) {
             if n > 0 {

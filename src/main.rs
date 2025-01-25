@@ -30,9 +30,9 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    let login = Login::new(LoginTypes::Environment);
+    let login = Login::new(LoginTypes::Module);
 
-    let driver = match DriverSpawn::new(DriverTypes::Edge) {
+    let driver = match DriverSpawn::new(DriverTypes::Gecko) {
         Ok(g) => g,
         Err(a) => panic!("{}", a),
     };

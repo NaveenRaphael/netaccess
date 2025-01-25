@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 fantoccini = "0.21.1"
+geckodriver = "0.35.0"
 regex = "1.10.6"
 tokio = { version = "1", features = ["sync", "rt", "time", "macros"] }

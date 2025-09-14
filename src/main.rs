@@ -1,5 +1,7 @@
 mod gecko;
 mod login;
+use std::{collections::HashMap, iter::Map};
+
 use fantoccini::{Client, ClientBuilder, Locator};
 use gecko::{DriverSpawn, DriverTypes};
 use login::{Login, LoginTypes};
@@ -13,17 +15,43 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
     let password_fill = driver.wait().for_element(Locator::Id("password")).await?;
     password_fill.send_keys(login.password().as_str()).await?;
 
-    let first_button = driver.wait().for_element(Locator::Id("submit")).await?;
+    // let first_button = driver.wait().for_element(Locator::Id("submit")).await?;
+    let first_button = driver
+        .wait()
+        .for_element(Locator::XPath(
+            "/html/body/main/div/div/div[2]/form/div[3]/button",
+        ))
+        .await?;
     first_button.click().await?;
 
-    driver
-        .goto("https://netaccess.iitm.ac.in/account/approve")
+    // // let first_button = driver
+    // //     .wait()
+    // //     .for_element(Locator::Css(".btn-primary"))
+    // //     .await?;
+    driver.goto("https://netaccess.iitm.ac.in/approve").await?;
+    // // let select_time = driver.wait().for_element(Locator::Id("radios-1")).await?;
+    let select_time = driver
+        .wait()
+        .for_element(Locator::XPath(
+            "/html/body/main/div/div/div[1]/div/div[1]/form/div[1]/select/option[3]",
+        ))
         .await?;
-    let select_time = driver.wait().for_element(Locator::Id("radios-1")).await?;
     select_time.click().await?;
 
-    let second_button = driver.wait().for_element(Locator::Id("approveBtn")).await?;
+    // let second_button = driver.wait().for_element(Locator::Id("approveBtn")).await?;
+    let second_button = driver
+        .wait()
+        .for_element(Locator::XPath(
+            "/html/body/main/div/div/div[1]/div/div[1]/form/div[3]/button",
+        ))
+        .await?;
     second_button.click().await?;
+
+    let acceptable_button = driver
+        .wait()
+        .for_element(Locator::Id("btnAupAccept"))
+        .await?;
+    acceptable_button.click().await?;
 
     Ok(())
 }
@@ -38,7 +66,11 @@ async fn main() {
     };
 
     //Because Linux is just that fast smh
+    //
+    let mut map = fantoccini::wd::Capabilities::new();
+    map.insert("acceptInsecureCerts".into(), true.into());
     let client = match ClientBuilder::native()
+        .capabilities(map)
         .connect(driver.get_port().as_str())
         .await
     {

@@ -4,7 +4,6 @@ use fantoccini::{Client, ClientBuilder, Locator};
 use gecko::{DriverSpawn, DriverTypes};
 use login::{Login, LoginTypes};
 use serde_json::{self, json};
-use std::{collections::HashMap, iter::Map};
 
 async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::error::CmdError> {
     driver.goto("https://netaccess.iitm.ac.in").await?;

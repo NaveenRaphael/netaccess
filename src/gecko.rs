@@ -5,6 +5,7 @@ use std::{
 
 use regex::Regex;
 
+#[allow(dead_code)]
 pub enum DriverTypes {
     Gecko,
     Edge,

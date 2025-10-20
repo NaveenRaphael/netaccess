@@ -1,10 +1,10 @@
 mod gecko;
 mod login;
-use std::{collections::HashMap, iter::Map};
-
 use fantoccini::{Client, ClientBuilder, Locator};
 use gecko::{DriverSpawn, DriverTypes};
 use login::{Login, LoginTypes};
+use serde_json::{self, json};
+use std::{collections::HashMap, iter::Map};
 
 async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::error::CmdError> {
     driver.goto("https://netaccess.iitm.ac.in").await?;
@@ -68,7 +68,13 @@ async fn main() {
     //Because Linux is just that fast smh
     //
     let mut map = fantoccini::wd::Capabilities::new();
+    let cap = json!({
+                "args":["-headless"]
+            }
+    );
+
     map.insert("acceptInsecureCerts".into(), true.into());
+    map.insert("moz:firefoxOptions".into(), cap);
     let client = match ClientBuilder::native()
         .capabilities(map)
         .connect(driver.get_port().as_str())

@@ -14,12 +14,14 @@ pub struct DriverSpawn {
     app: std::process::Child,
     port: String,
 }
+
 impl DriverSpawn {
     pub fn new(dr: DriverTypes) -> Result<Self, String> {
         let command = match dr {
             DriverTypes::Gecko => "geckodriver",
             DriverTypes::Edge => "msedgedriver",
         };
+
         let mut child = match Command::new(command).stdout(Stdio::piped()).spawn(){
             Ok(a) => a,
             Err(e) => match dr{
@@ -27,6 +29,7 @@ impl DriverSpawn {
                 DriverTypes::Edge => return Err(format!("Edge driver possibly not installed. Actual error: {}", e)),
             },
         };
+
         let stdout = child.stdout.take().unwrap();
         let mut bufread = BufReader::new(stdout);
         let mut buf = String::new();

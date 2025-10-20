@@ -9,4 +9,5 @@ edition = "2021"
 fantoccini = "0.21.1"
 geckodriver = "0.35.0"
 regex = "1.10.6"
+serde_json = "1.0.145"
 tokio = { version = "1", features = ["sync", "rt", "time", "macros"] }

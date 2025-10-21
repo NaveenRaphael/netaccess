@@ -8,6 +8,9 @@ use serde_json::{self, json};
 async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::error::CmdError> {
     driver.goto("https://netaccess.iitm.ac.in").await?;
 
+    println!("Opened netaccess...");
+
+    println!("Logging in...");
     let user_name_fill = driver.wait().for_element(Locator::Id("username")).await?;
     user_name_fill.send_keys(login.username().as_str()).await?;
 
@@ -23,20 +26,28 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
         .await?;
     first_button.click().await?;
 
-    // // let first_button = driver
-    // //     .wait()
-    // //     .for_element(Locator::Css(".btn-primary"))
-    // //     .await?;
+    // println!("{}", driver.source().await?);
+    println!("clicking approve");
+    // let first_button = driver
+    //     .wait()
+    //     .for_element(Locator::XPath("/html/body/main/div/div[3]/div[2]/div/a"))
+    //     .await?;
+    // first_button.click().await?;
     driver.goto("https://netaccess.iitm.ac.in/approve").await?;
+
+    println!("approve site loaded");
     // // let select_time = driver.wait().for_element(Locator::Id("radios-1")).await?;
     let select_time = driver
         .wait()
         .for_element(Locator::XPath(
-            "/html/body/main/div/div/div[1]/div/div[1]/form/div[1]/select/option[3]",
+            "/html/body/main/div/div/div[1]/div/div[1]/form/div[1]/select/option[2]",
         ))
         .await?;
+
+    println!("selecting the correct time?!");
     select_time.click().await?;
 
+    println!("selected duration");
     // let second_button = driver.wait().for_element(Locator::Id("approveBtn")).await?;
     let second_button = driver
         .wait()
@@ -52,12 +63,15 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
         .await?;
     acceptable_button.click().await?;
 
+    println!("Done!");
     Ok(())
 }
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     let login = Login::new(LoginTypes::Module);
+
+    println!("Spawning the driver");
 
     let driver = match DriverSpawn::new(DriverTypes::Gecko) {
         Ok(g) => g,
@@ -82,6 +96,7 @@ async fn main() {
         Ok(a) => a,
         Err(e) => panic!("Cannot connect because {e}"),
     };
+    println!("Connecting client");
 
     let Ok(_) = navigate_site(login, &client).await else {
         println!("Error in navigating site");

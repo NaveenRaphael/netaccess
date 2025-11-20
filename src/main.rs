@@ -17,7 +17,6 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
     let password_fill = driver.wait().for_element(Locator::Id("password")).await?;
     password_fill.send_keys(login.password().as_str()).await?;
 
-    // let first_button = driver.wait().for_element(Locator::Id("submit")).await?;
     let first_button = driver
         .wait()
         .for_element(Locator::XPath(
@@ -26,17 +25,10 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
         .await?;
     first_button.click().await?;
 
-    // println!("{}", driver.source().await?);
     println!("clicking approve");
-    // let first_button = driver
-    //     .wait()
-    //     .for_element(Locator::XPath("/html/body/main/div/div[3]/div[2]/div/a"))
-    //     .await?;
-    // first_button.click().await?;
     driver.goto("https://netaccess.iitm.ac.in/approve").await?;
 
     println!("approve site loaded");
-    // // let select_time = driver.wait().for_element(Locator::Id("radios-1")).await?;
     let select_time = driver
         .wait()
         .for_element(Locator::XPath(
@@ -48,7 +40,6 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), fantoccini::
     select_time.click().await?;
 
     println!("selected duration");
-    // let second_button = driver.wait().for_element(Locator::Id("approveBtn")).await?;
     let second_button = driver
         .wait()
         .for_element(Locator::XPath(
@@ -82,12 +73,12 @@ async fn main() {
     //
     let mut map = fantoccini::wd::Capabilities::new();
     let cap = json!({
-                "args":["-headless"]
-            }
-    );
+        "args":["-headless"]
+    });
 
     map.insert("acceptInsecureCerts".into(), true.into());
     map.insert("moz:firefoxOptions".into(), cap);
+    println!("Spawning client");
     let client = match ClientBuilder::native()
         .capabilities(map)
         .connect(driver.get_port().as_str())
@@ -102,9 +93,11 @@ async fn main() {
         println!("Error in navigating site");
         return;
     };
+    println!("Done! cleaning and closing!");
 
     let Ok(_) = client.close().await else {
         println!("Error in closing driver");
         return;
     };
+    println!("closed the client...");
 }

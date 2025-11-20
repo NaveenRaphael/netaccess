@@ -9,25 +9,35 @@ use regex::Regex;
 pub enum DriverTypes {
     Gecko,
     Edge,
+    None,
 }
 
-pub struct DriverSpawn {
+struct DriverSpawnInner {
     app: std::process::Child,
     port: String,
 }
+pub struct DriverSpawn(Option<DriverSpawnInner>);
 
 impl DriverSpawn {
     pub fn new(dr: DriverTypes) -> Result<Self, String> {
+        match dr {
+            DriverTypes::None => return Ok(DriverSpawn(None)),
+            _ => {}
+        };
         let command = match dr {
             DriverTypes::Gecko => "geckodriver",
             DriverTypes::Edge => "msedgedriver",
+            DriverTypes::None => unreachable!(),
         };
+        println!("spawning {command}");
 
-        let mut child = match Command::new(command).stdout(Stdio::piped()).spawn(){
+        let mut child = match Command::new(command).args(["--log", "trace"]).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn(){
             Ok(a) => a,
             Err(e) => match dr{
                 DriverTypes::Gecko => return Err(format!("Geckodriver possibly not installed; please run `cargo install geckodriver`. Actual error: {}", e)),
                 DriverTypes::Edge => return Err(format!("Edge driver possibly not installed. Actual error: {}", e)),
+                DriverTypes::None => unreachable!(),
+
             },
         };
 
@@ -39,6 +49,7 @@ impl DriverSpawn {
         let re = match dr {
             DriverTypes::Gecko => Regex::new(r"127\.0\.0\.1:(\d+)").unwrap(),
             DriverTypes::Edge => Regex::new(r" (\d{5})\.").unwrap(),
+            DriverTypes::None => unreachable!(),
         };
         while let Ok(n) = bufread.read_line(&mut buf) {
             if n > 0 {
@@ -60,11 +71,15 @@ impl DriverSpawn {
             }
         }
         child.stdout.replace(bufread.into_inner());
-        return Ok(DriverSpawn { app: child, port });
+        println!("made driver!");
+        return Ok(DriverSpawn(Some(DriverSpawnInner { app: child, port })));
     }
 
     pub(crate) fn get_port(&self) -> String {
-        let a = format!("http://localhost:{}", self.port);
+        let a = match self.0 {
+            Some(ref a) => format!("http://localhost:{}", a.port),
+            None => "http://localhost:4444".into(),
+        };
         println!("{}", a);
         return a;
     }
@@ -72,6 +87,7 @@ impl DriverSpawn {
 
 impl Drop for DriverSpawn {
     fn drop(&mut self) {
-        self.app.kill().expect("This should work, you know");
+        let Some(a) = &mut self.0 else { return };
+        a.app.kill().expect("This should work, you know");
     }
 }

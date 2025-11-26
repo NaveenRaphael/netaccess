@@ -80,7 +80,7 @@ impl DriverSpawn {
             Some(ref a) => format!("http://localhost:{}", a.port),
             None => "http://localhost:4444".into(),
         };
-        println!("{}", a);
+        println!("Connecting to {}", a);
         return a;
     }
 }
@@ -88,6 +88,8 @@ impl DriverSpawn {
 impl Drop for DriverSpawn {
     fn drop(&mut self) {
         let Some(a) = &mut self.0 else { return };
-        a.app.kill().expect("This should work, you know");
+        a.app
+            .kill()
+            .expect("Killing the driver on drop should not fail");
     }
 }

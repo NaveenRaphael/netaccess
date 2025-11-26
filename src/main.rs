@@ -90,14 +90,12 @@ async fn main() {
     println!("Connecting client");
 
     let Ok(_) = navigate_site(login, &client).await else {
-        println!("Error in navigating site");
-        return;
+        panic!("Error in navigating site");
     };
     println!("Done! cleaning and closing!");
 
     let Ok(_) = client.close().await else {
-        println!("Error in closing driver");
-        return;
+        panic!("Error in closing driver");
     };
     println!("closed the client...");
 }

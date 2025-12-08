@@ -29,8 +29,9 @@ impl Login {
         }
     }
     fn new_env() -> Self {
-        let (Ok(username), Ok(password)) = (env::var("LDAP_USERNAME"),env::var("LDAP_PASSWORD")) else{
-            panic!("LDAP Credentials are not in environment variables... either add them as explained in README.md or change the LoginType to Module"); 
+        let (Ok(username), Ok(password)) = (env::var("LDAP_USERNAME"), env::var("LDAP_PASSWORD"))
+        else {
+            panic!("LDAP Credentials are not in environment variables... either add them as explained in README.md or change the LoginType to Module");
         };
         Login { username, password }
     }

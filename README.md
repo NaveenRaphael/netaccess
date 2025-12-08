@@ -14,15 +14,18 @@ These values can be changed in the `.src/main.rs`
 Instructions to use
 ==
 1. Install rust. See instructions on `https://rust-lang.org/tools/install/`
-2. Run `cargo install geckodriver` in any terminal
-3. There are 2 ways to handle the credentials
+2. Ensure you have firefox or MS Edge. Chrome support might happen if someone needs it.
+3. The browsers cannot be automated alone, we need the corresponding drivers.
+ 1. If using firefox, the driver is handled by geckodriver. run `cargo install geckodriver`
+ 2. If using edge, the corresponding driver has to be installed the microsoft way	 
+4. There are 2 ways to handle the credentials
 	1. Using environment variables: Make 2 environment variables as follows 
 		1. LDAP_USERNAME: which has your username
 		2. LDAP_PASSWORD: which has your password
 	2. Edit login.rs
 		1. Change the string with "username" and "password" to the correct values
-4. Edit the constants at the beginning of main.rs to set the correct constants
-5. run `cargo build --release` in this directory
+5. Edit the constants at the beginning of main.rs to set the correct constants
+6. run `cargo build --release` in this directory
 	1. The executable will be in `./target/release/netaccess`
 
 Todo

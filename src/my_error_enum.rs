@@ -1,9 +1,11 @@
 use std::{error::Error, fmt::Display};
 
 use fantoccini::error::CmdError;
+use serde_json::Error as Serror;
 
 #[derive(Debug)]
 pub enum MyError {
+    Serde(Serror),
     Fanto(fantoccini::error::CmdError),
     Cred(String),
 }
@@ -12,6 +14,7 @@ impl Display for MyError {
         match self {
             MyError::Fanto(cmd_error) => write!(f, "{cmd_error}"),
             MyError::Cred(s) => write!(f, "{s}"),
+            MyError::Serde(s) => write!(f, "{s}"),
         }
     }
 }
@@ -19,5 +22,10 @@ impl Error for MyError {}
 impl From<CmdError> for MyError {
     fn from(value: CmdError) -> Self {
         MyError::Fanto(value)
+    }
+}
+impl From<Serror> for MyError {
+    fn from(value: Serror) -> Self {
+        MyError::Serde(value)
     }
 }

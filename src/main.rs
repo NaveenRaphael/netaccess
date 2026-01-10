@@ -16,7 +16,7 @@ const LOGIN_TYPE: LoginTypes = LoginTypes::Module;
 
 async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
     println!("Opening netaccess...");
-    driver.goto("https://netaccess.iitm.ac.in").await?;
+    driver.goto("https://cc.iitm.ac.in/").await?;
 
     println!("Logging in...");
 
@@ -28,12 +28,9 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
 
     let first_button = driver
         .wait()
-        .for_element(Locator::XPath(
-            "/html/body/main/div/div/div[2]/form/div[3]/button",
-        ))
+        .for_element(Locator::Css("html body.index-page section#hero.hero.section.dark-background div#front-carousel.carousel.slide.carousel-fade div.carousel-item form.form button.btn.btn-primary.btn-lg"))
         .await?;
     first_button.click().await?;
-
     //Using find did not work for some reason...
     match driver.find_all(Locator::Id("username")).await {
         Ok(a) => {
@@ -45,14 +42,12 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
     };
 
     println!("clicking approve");
-    driver.goto("https://netaccess.iitm.ac.in/approve").await?;
+    driver.goto("https://cc.iitm.ac.in/account/approve").await?;
 
     println!("approve site loaded");
     let select_time = driver
         .wait()
-        .for_element(Locator::XPath(
-            "/html/body/main/div/div/div[1]/div/div[1]/form/div[1]/select/option[2]",
-        ))
+        .for_element(Locator::XPath(r#"//*[@id="radios-1"]"#))
         .await?;
 
     println!("selecting the correct time?!");
@@ -61,16 +56,11 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
     println!("selected duration");
     let second_button = driver
         .wait()
-        .for_element(Locator::XPath(
-            "/html/body/main/div/div/div[1]/div/div[1]/form/div[3]/button",
-        ))
+        .for_element(Locator::XPath(r#"//*[@id="use-policy"]"#))
         .await?;
     second_button.click().await?;
 
-    let acceptable_button = driver
-        .wait()
-        .for_element(Locator::Id("btnAupAccept"))
-        .await?;
+    let acceptable_button = driver.wait().for_element(Locator::Id("approveBtn")).await?;
     acceptable_button.click().await?;
 
     println!("Done!");
@@ -93,7 +83,7 @@ async fn main() {
     if HEADLESS {
         // If you do not want headless, set this to false
         let cap = json!({
-            "args":["-headless"]
+            // "args":["-headless"]
         });
         map.insert("acceptInsecureCerts".into(), true.into());
         map.insert("moz:firefoxOptions".into(), cap);

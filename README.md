@@ -16,8 +16,8 @@ Instructions to use
 1. Install rust. See instructions on `https://rust-lang.org/tools/install/`
 2. Ensure you have firefox or MS Edge. Chrome support might happen if someone needs it.
 3. The browsers cannot be automated alone, we need the corresponding drivers.
- 1. If using firefox, the driver is handled by geckodriver. run `cargo install geckodriver`
- 2. If using edge, the corresponding driver has to be installed the microsoft way	 
+ 	1. If using firefox, the driver is handled by geckodriver. run `cargo install geckodriver`
+ 	2. If using edge, the corresponding driver has to be installed the microsoft way	 
 4. There are 2 ways to handle the credentials
 	1. Using environment variables: Make 2 environment variables as follows 
 		1. LDAP_USERNAME: which has your username

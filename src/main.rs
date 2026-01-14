@@ -42,22 +42,18 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
     };
 
     println!("clicking approve");
-    driver.goto("https://cc.iitm.ac.in/account/approve").await?;
-
-    println!("approve site loaded");
-    let select_time = driver
-        .wait()
-        .for_element(Locator::XPath(r#"//*[@id="radios-1"]"#))
+    driver
+        .goto("https://cc.iitm.ac.in/netaccess/account/approve")
         .await?;
+
+    println!("approve site loaded, clicking time");
+    let select_time = driver.wait().for_element(Locator::Id("radios-1")).await?;
 
     println!("selecting the correct time?!");
     select_time.click().await?;
 
     println!("selected duration");
-    let second_button = driver
-        .wait()
-        .for_element(Locator::XPath(r#"//*[@id="use-policy"]"#))
-        .await?;
+    let second_button = driver.wait().for_element(Locator::Id("use-policy")).await?;
     second_button.click().await?;
 
     let acceptable_button = driver.wait().for_element(Locator::Id("approveBtn")).await?;
@@ -83,7 +79,7 @@ async fn main() {
     if HEADLESS {
         // If you do not want headless, set this to false
         let cap = json!({
-            // "args":["-headless"]
+            "args":["-headless"]
         });
         map.insert("acceptInsecureCerts".into(), true.into());
         map.insert("moz:firefoxOptions".into(), cap);

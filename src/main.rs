@@ -11,12 +11,14 @@ use serde_json::{self, json};
 // These are the variables that users need to change. Note that headless only works on Geckodriver(Mozilla firefox) right now.
 const DRIVER_TYPE: DriverTypes = DriverTypes::Gecko;
 // const HEADLESS: bool = false;
-const HEADLESS: bool = true;
+const HEADLESS: bool = false;
 const LOGIN_TYPE: LoginTypes = LoginTypes::Module;
 
 async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
     println!("Opening netaccess...");
-    driver.goto("https://cc.iitm.ac.in/").await?;
+    driver
+        .goto("https://cc.iitm.ac.in/netaccess/account/login")
+        .await?;
 
     println!("Logging in...");
 
@@ -26,10 +28,11 @@ async fn navigate_site(login: Login, driver: &Client) -> Result<(), MyError> {
     let password_fill = driver.wait().for_element(Locator::Id("password")).await?;
     password_fill.send_keys(login.password().as_str()).await?;
 
-    let first_button = driver
-        .wait()
-        .for_element(Locator::Css("html body.index-page section#hero.hero.section.dark-background div#front-carousel.carousel.slide.carousel-fade div.carousel-item form.form button.btn.btn-primary.btn-lg"))
-        .await?;
+    // let first_button = driver
+    //     .wait()
+    //     .for_element(Locator::Css("html body.index-page section#hero.hero.section.dark-background div#front-carousel.carousel.slide.carousel-fade div.carousel-item form.form button.btn.btn-primary.btn-lg"))
+    //     .await?;
+    let first_button = driver.wait().for_element(Locator::Id("submit")).await?;
     first_button.click().await?;
     //Using find did not work for some reason...
     match driver.find_all(Locator::Id("username")).await {
@@ -79,7 +82,10 @@ async fn main() {
     if HEADLESS {
         // If you do not want headless, set this to false
         let cap = json!({
-            "args":["-headless"]
+            "args":["-headless"],
+            "prefs": json!({
+                "gfx.downloadable_fonts.enable":false
+            })
         });
         map.insert("acceptInsecureCerts".into(), true.into());
         map.insert("moz:firefoxOptions".into(), cap);
